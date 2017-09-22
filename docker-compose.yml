@@ -1,0 +1,29 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./CASinoApp:/usr/var/app
+      - ./cas.yml:/usr/var/app/config/cas.yml
+    depends_on:
+      - db
+      - ldap
+    command: rails server
+  ldap:
+    image: ipetepete/docker-ldap
+    envirnoment:
+      - ADMINPASS=Pa$$Werd
+      - DN=dc=yourdomain,dc=com
+    ports:
+      - "389:389"
+    command: ["sh", "./start_server.sh"]
+  db:
+    image: mysql
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
