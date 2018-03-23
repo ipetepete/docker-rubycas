@@ -6,24 +6,28 @@ services:
       - "3000:3000"
     volumes:
       - ./CASinoApp:/usr/var/app
-      - ./cas.yml:/usr/var/app/config/cas.yml
+      - ./startapp.sh:/usr/var/app/startapp.sh
+      - ../hiera/files/sso-cas.yml:/usr/var/app/config/cas.yml
+      - ../hiera/files/sso-database.yml:/usr/var/app/config/database.yml
     depends_on:
       - db
       - ldap
-    command: rails server
+    command: bash -c "bundle exec rake assets:precompile && rails server"
   ldap:
     image: ipetepete/docker-ldap
-    envirnoment:
-      - ADMINPASS=Pa$$Werd
-      - DN=dc=yourdomain,dc=com
+    environment:
+      - ADMINPASS=passwurd
+      - DN=dc=sdm,dc=noao,dc=edu
     ports:
       - "389:389"
     command: ["sh", "./start_server.sh"]
   db:
     image: mysql
     volumes:
-      - ./db:/var/lib/mysql
+      - ../portal/db:/var/lib/mysql
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=userPassword
+      - MYSQL_ROOT_PASSWORD=sUp3rZeCur
